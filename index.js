@@ -104,13 +104,39 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 // Initialize and run the game
-const rows = 50;
-const cols = 50;
-const emptyBoard = Array.from({ length: rows }, () => new Array(cols).fill(0));
-const initialBoard = seedBoard(emptyBoard, 400);
+const rows = 50
+const cols = 50
+const emptyBoard = Array.from({ length: rows }, () => new Array(cols).fill(0))
+const initialBoard = seedBoard(emptyBoard, 400)
 let board = initialBoard
 
-setInterval(() => {
-  board = nextGeneration(board);
-  drawBoard(board);
-}, 1000);
+
+let animationFrameId = null
+let lastUpdateTime = 0
+const updateInterval = 1000 // Update every 1000 ms
+
+function gameLoop(timestamp) {
+  if (!lastUpdateTime) lastUpdateTime = timestamp
+
+  const deltaTime = timestamp - lastUpdateTime
+
+  if (deltaTime >= updateInterval) {
+    board = nextGeneration(board)
+    drawBoard(board)
+    lastUpdateTime = timestamp
+  }
+
+  animationFrameId = requestAnimationFrame(gameLoop)
+}
+
+function startStop() {
+  if (animationFrameId) {
+    cancelAnimationFrame(animationFrameId)
+    animationFrameId = null
+    lastUpdateTime = 0
+  } else {
+    animationFrameId = requestAnimationFrame(gameLoop)
+  }
+}
+
+startStop()
