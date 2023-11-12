@@ -62,6 +62,8 @@ const drawBoard = (board) => {
     const tr = document.createElement("tr");
     row.forEach((cell, j) => {
       const td = document.createElement("td");
+      td.setAttribute("data-x", i);
+      td.setAttribute("data-y", j);
       td.classList.add(cell === 1 ? "alive" : "dead");
       tr.appendChild(td);
     });
@@ -72,6 +74,19 @@ const drawBoard = (board) => {
   container.innerHTML = "";
   container.appendChild(table);
 };
+
+function toggleCell(e) {
+  const cell = e.target;
+  // TODO: Check if the cell is a td
+  // TODO: update the cell's state
+  cell.classList.toggle("alive");
+  cell.classList.toggle("dead");
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const container = document.getElementById("container");
+  container.addEventListener("click", toggleCell);
+});
 
 // TODO: Add a button to start/stop the game
 
