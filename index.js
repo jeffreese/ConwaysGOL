@@ -1,74 +1,101 @@
-// Define the size of the game board
-const rows = 20;
-const cols = 20;
+// Function to seed the board
+const seedBoard = (board, numberOfCells) => {
+  let newBoard = board.map(row => row.slice());
+  for (let seededCells = 0; seededCells < numberOfCells; ) {
+    let x = Math.floor(Math.random() * board.length);
+    let y = Math.floor(Math.random() * board[0].length);
 
-// Function to create a 2D array
-function createArray(rows, cols) {
-  let arr = new Array(rows);
-  for (let i = 0; i < arr.length; i++) {
-    arr[i] = new Array(cols).fill(0);
-  }
-  return arr;
-}
-
-// Initialize the game board
-let board = createArray(rows, cols);
-seedBoard(board, 50)
-
-function seedBoard(board, numberOfCells) {
-  let seededCells = 0;
-
-  while (seededCells < numberOfCells) {
-    let x = Math.floor(Math.random() * rows);
-    let y = Math.floor(Math.random() * cols);
-
-    if (board[x][y] === 0) {
-      board[x][y] = 1;
+    if (newBoard[x][y] === 0) {
+      newBoard[x][y] = 1;
       seededCells++;
     }
   }
-}
+  return newBoard;
+};
 
 // Function to calculate the next generation
-function nextGeneration(board) {
-  let newBoard = createArray(rows, cols);
+const nextGeneration = (board) => {
+  return board.map((row, x) => row.map((cell, y) => {
+    const neighbors = countNeighbors(board, x, y);
+    const isAlive = cell === 1;
 
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      let state = board[i][j];
-      // Count live neighbors
-      let neighbors = countNeighbors(board, i, j);
-
-      // Game of Life rules
-      if (state === 0 && neighbors === 3) {
-        newBoard[i][j] = 1;
-      } else if (state === 1 && (neighbors < 2 || neighbors > 3)) {
-        newBoard[i][j] = 0;
-      } else {
-        newBoard[i][j] = state;
-      }
-    }
-  }
-
-  return newBoard;
-}
+    if (isAlive && (neighbors < 2 || neighbors > 3)) return 0;
+    if (!isAlive && neighbors === 3) return 1;
+    return cell;
+  }));
+};
 
 // Function to count a cell's live neighbors
-function countNeighbors(board, x, y) {
-  let count = 0;
-  for (let i = -1; i <= 1; i++) {
-    for (let j = -1; j <= 1; j++) {
-      const col = (x + i + rows) % rows;
-      const row = (y + j + cols) % cols;
-      count += board[col][row];
-    }
-  }
-  count -= board[x][y];
-  return count;
-}
+const countNeighbors = (board, x, y, wrap=false) => {
+  const rows = board.length;
+  const cols = board[0].length;
 
-// Run the game
+  return [-1, 0, 1].reduce((acc, i) => {
+    return acc + [-1, 0, 1].reduce((acc2, j) => {
+      if (i === 0 && j === 0) return acc2; // Skip the cell itself
+
+      if (wrap) {
+        const col = (x + i + rows) % rows;
+        const row = (y + j + cols) % cols;
+        return acc2 + board[col][row];
+      } else {
+        const newX = x + i;
+        const newY = y + j;
+
+        // Check if the neighbor is within the bounds of the board
+        if (newX >= 0 && newX < rows && newY >= 0 && newY < cols) {
+          return acc2 + board[newX][newY];
+        }
+        return acc2;
+      }
+    }, 0);
+  }, 0);
+};
+
+
+// Function to draw the game board
+const drawBoard = (board) => {
+  const table = document.createElement("table");
+  table.setAttribute("id", "board");
+
+  board.forEach((row, i) => {
+    const tr = document.createElement("tr");
+    row.forEach((cell, j) => {
+      const td = document.createElement("td");
+      td.classList.add(cell === 1 ? "alive" : "dead");
+      tr.appendChild(td);
+    });
+    table.appendChild(tr);
+  });
+
+  const container = document.getElementById("container");
+  container.innerHTML = "";
+  container.appendChild(table);
+};
+
+// TODO: Add a button to start/stop the game
+
+// TODO: Add a button to clear the board
+
+// TODO: Add a button to seed the board
+
+// TODO: Add a button to change the speed of the game
+
+// TODO: Add a button to change the size of the board
+
+// TODO: Add a button to toggle wrapping
+
+// TODO: Add ability to click on cells to toggle them
+
+
+// Initialize and run the game
+const rows = 50;
+const cols = 50;
+const emptyBoard = Array.from({ length: rows }, () => new Array(cols).fill(0));
+const initialBoard = seedBoard(emptyBoard, 400);
+let board = initialBoard
+
 setInterval(() => {
   board = nextGeneration(board);
-  console.table(board); 
-}, 1000); 
+  drawBoard(board);
+}, 1000);
