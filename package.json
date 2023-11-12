@@ -1,0 +1,15 @@
+{
+  "name": "conways-gol",
+  "version": "1.0.0",
+  "description": "## TODO - [ ] Add a button to start/stop the game - [ ] Add a button to clear the board - [ ] Add a button to seed the board - [ ] Add a button to change the speed of the game - [ ] Add a button to change the size of the board - [ ] Add a button to toggle wrapping - [ ] Add ability to click on cells to toggle them - [ ] Refactor and organize code, add modules",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "http-server"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "http-server": "^14.1.1"
+  }
+}
